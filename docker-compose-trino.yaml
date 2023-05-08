@@ -1,0 +1,56 @@
+version: '3.7'
+services:
+  coordinator:
+    container_name: mn-coordinator
+    image: 'trinodb/trino:408'
+    ports:
+      - "9091:8080"
+    volumes:
+      - ./etc/coordinator:/etc/trino
+    networks:
+      - trino-multinode-network
+  worker1:
+    container_name: mn-worker1
+    image: 'trinodb/trino:408'
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./etc/worker:/etc/trino
+    networks:
+      - trino-multinode-network
+  worker2:
+    container_name: mn-worker2
+    image: 'trinodb/trino:408'
+    ports:
+      - "8082:8081"
+    volumes:
+      - ./etc/worker:/etc/trino
+    networks:
+      - trino-multinode-network
+  postgres1:
+    container_name: mn-postgres1
+    image: postgres:latest
+    hostname: postgres1
+    environment:
+      POSTGRES_USER: ${POSTGRES1_USER}
+      POSTGRES_PASSWORD: ${POSTGRES1_PASSWORD}
+      POSTGRES_DB: trino_deneme
+    ports:
+      - '5432:5432'
+    networks:
+      - trino-multinode-network
+  postgres2:
+    container_name: mn-postgres2
+    image: postgres:latest
+    hostname: postgres2
+    environment:
+      POSTGRES_USER: ${POSTGRES2_USER}
+      POSTGRES_PASSWORD: ${POSTGRES2_PASSWORD}
+      POSTGRES_DB: DWH_ANALYTICS
+    ports:
+      - '5433:5432'
+    networks:
+      - trino-multinode-network
+networks:
+  trino-multinode-network:
+    driver: bridge
